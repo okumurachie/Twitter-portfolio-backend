@@ -25,6 +25,7 @@
 
 /storage/*.key
 /storage/pail
+/storage/firebase/
 
 /bootstrap/cache
 
