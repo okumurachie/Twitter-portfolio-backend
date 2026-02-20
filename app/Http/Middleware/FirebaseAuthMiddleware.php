@@ -34,6 +34,7 @@ class FirebaseAuthMiddleware
         try {
             $auth = Firebase::auth();
             $verifiedIdToken = $auth->verifyIdToken($idToken);
+
             $uid = $verifiedIdToken->claims()->get('sub');
 
             $user = User::firstOrCreate(

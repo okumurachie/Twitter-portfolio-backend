@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\User;
 use App\Models\Post;
 
 class PostController extends Controller
@@ -20,16 +19,31 @@ class PostController extends Controller
             'content' => $validated['content'],
         ]);
 
-        return response()->json([
-            'message' => '投稿しました',
-            'post' => $post,
-        ], 201);
+        $post->load('user');
+        $post->loadCount('likes');
+
+        return response()->json($post, 201);
     }
 
     public function index()
     {
-        return Post::with('user')
-            ->latest()
-            ->get();
+        return response()->json(
+            Post::with('user')
+                ->withCount('likes')
+                ->latest()
+                ->get()
+        );
+    }
+
+    public function destroy(Request $request, Post $post)
+    {
+        $user = $request->user();
+        if ($post->user_id !== $user->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $post->delete();
+
+        return response()->json(['message' => 'Deleted']);
     }
 }
