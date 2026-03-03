@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 
 class Like extends Model
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
 
     protected $fillable = [
         'user_id',

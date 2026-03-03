@@ -8,7 +8,7 @@ use Illuminate\Notifications\Notifiable;
 
 class Comment extends Model
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
 
     protected $fillable = [
         'user_id',

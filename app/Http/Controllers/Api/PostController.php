@@ -14,15 +14,14 @@ class PostController extends Controller
         $validated = $request->validate([
             'content' => 'required|string|max:120',
         ]);
-        $post = Post::create([
-            'user_id' => $user->id,
+        $post = $user->posts()->create([
             'content' => $validated['content'],
         ]);
 
-        $post->load('user');
-        $post->loadCount('likes');
-
-        return response()->json($post, 201);
+        return response()->json(
+            $post->load(['user'])->loadCount(['likes']),
+            201
+        );
     }
 
     public function index()
@@ -38,8 +37,7 @@ class PostController extends Controller
     public function show(Post $post)
     {
         return response()->json(
-            $post->load('user')
-                ->loadCount('likes'),
+            $post->load(['user'])->loadCount(['likes']),
             200
         );
     }
