@@ -24,20 +24,20 @@ Twitter風の簡易SNSアプリのバックエンドAPIです。
 
 ## 1.リポジトリをクローン
 
--   1. git clone git@github.com:okumurachie/Twitter-backend.git
--   2. cd Twitter-backend
+- git clone git@github.com:okumurachie/Twitter-backend.git
+- cd Twitter-backend
 
 ## 2. .envファイル作成
 
 - cp .env.example .env
   (.env.example ファイルから.env を作成し、環境変数を変更)
 
-            DB_CONNECTION=mysql
-            DB_HOST=127.0.0.1
-            DB_PORT=3306
-            DB_DATABASE=twitter_sns_db
-            DB_USERNAME=root
-            DB_PASSWORD=
+                    DB_CONNECTION=mysql
+                    DB_HOST=127.0.0.1
+                    DB_PORT=3306
+                    DB_DATABASE=twitter_sns_db
+                    DB_USERNAME=root
+                    DB_PASSWORD=
 
 ## 3.依存パッケージインストール
 
@@ -76,10 +76,10 @@ Twitter風の簡易SNSアプリのバックエンドAPIです。
 
 ## システム構成
 
-Frontend（Nuxt3）
-↓ REST API
-Backend（Laravel）
-↓
+Frontend（Nuxt3）<br>
+↓ REST API<br>
+Backend（Laravel）<br>
+↓<br>
 MySQL
 
 ## 使用技術
