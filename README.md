@@ -24,25 +24,35 @@ Twitter風の簡易SNSアプリのバックエンドAPIです。
 
 ## 1.リポジトリをクローン
 
-- git clone git@github.com:okumurachie/Twitter-backend.git
-- cd Twitter-backend
+```bash
+git clone git@github.com:okumurachie/Twitter-backend.git
+cd Twitter-backend
+```
 
 ## 2. .envファイル作成
 
-- cp .env.example .env
-  (.env.example ファイルから.env を作成し、環境変数を変更)
+```bash
+cp .env.example .env
+```
 
-                    DB_CONNECTION=mysql
-                    DB_HOST=127.0.0.1
-                    DB_PORT=3306
-                    DB_DATABASE=twitter_sns_db
-                    DB_USERNAME=root
-                    DB_PASSWORD=
+(.env.example ファイルから.env を作成し、環境変数を変更)
+
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=twitter_sns_db
+    DB_USERNAME=root
+    DB_PASSWORD=
 
 ## 3.依存パッケージインストール
 
+```bash
 - composer install
+```
+
+```bash
 - php artisan key:generate
+```
 
 ### Firebase設定
 
@@ -62,10 +72,17 @@ Twitter風の簡易SNSアプリのバックエンドAPIです。
 
 ### DB初期化とシーディング
 
-- php artisan migrate:fresh --seed
-  (初期表示用のダミーデータを作成)
-- php artisan serve
-  (バックエンドサーバー立ち上げ)
+```bash
+php artisan migrate:fresh --seed
+```
+
+(初期表示用のダミーデータを作成)
+
+```bash
+php artisan serve
+```
+
+(バックエンドサーバー立ち上げ)
 
 #### 注意事項(ダミーユーザーについて)
 
@@ -101,7 +118,7 @@ MySQL
 
 ## 使い方（ローカル確認）
 
-- 1.フロントエンドを起動（https://github.com/okumurachie/Twitter-frontendからクローン）
+- 1.フロントエンドを起動（https://github.com/okumurachie/Twitter-frontend.gitからクローン）
 - 2.Firebaseでユーザー登録（Test User3など）
 - 3.投稿作成・投稿削除・いいね・コメント作成を操作（Seederユーザーは表示用で操作不可）
 
