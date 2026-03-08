@@ -37,7 +37,7 @@ class PostController extends Controller
     public function show(Post $post)
     {
         return response()->json(
-            $post->load(['user'])->loadCount(['likes']),
+            $post->load(['user', 'comments.user'])->loadCount(['likes']),
             200
         );
     }

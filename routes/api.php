@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Kreait\Firebase\Auth as FirebaseAuth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\CommentController;
@@ -19,6 +20,7 @@ Route::get('/posts/{post}/comments', [CommentController::class, 'index']);
 
 Route::middleware('auth.firebase')->group(function () {
 
+    Route::post('/user/update-name', [UserController::class, 'updateName']);
     Route::get('/user', function (Request $request) {
         return response()->json([
             'id' => $request->user()->id,
