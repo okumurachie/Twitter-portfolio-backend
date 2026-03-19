@@ -4,6 +4,7 @@
 
 Twitter風の簡易SNSアプリのバックエンドAPIです。
 フロントエンド（Nuxt 4）と連携し、LaravelでREST APIを構築しています。
+フロントエンド（Nuxt）からのリクエストを受け取り、認証・データ処理・DB操作を担当します。
 
 ## 作成した目的
 
@@ -20,172 +21,68 @@ Twitter風の簡易SNSアプリのバックエンドAPIです。
 
 ※ 本アプリはローカル環境での動作を前提としています。デプロイは行っていません。
 
-# 環境構築手順（ローカル開発用）
-
-### 動作環境
-
-- PHP 8.2 以上（Laravel 12 要件）
-- Composer
-- MySQL
-
----
-
-## 1.リポジトリをクローン
-
-```bash
-git clone git@github.com:okumurachie/Twitter-backend.git
-cd Twitter-backend
-```
-
-## 2. .envファイル作成
-
-```bash
-cp .env.example .env
-```
-
-## 3.データベース作成
-
-MySQLにログインし、以下を実行してください。
-
-```sql
-CREATE DATABASE twitter_sns_db;
-```
-
-## 4..envのDB設定を編集
-
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=twitter_sns_db
-DB_USERNAME=root
-DB_PASSWORD=
-```
-
-## 5.依存パッケージインストール
-
-```bash
-composer install
-```
-
-```bash
-php artisan key:generate
-```
-
-## 6.Firebase設定
-
-本アプリでは Firebase Authentication を使用しています。
-
-1. Firebaseプロジェクトを作成 <br>
-   Firebaseコンソールでプロジェクトを作成してください。<br>
-   Firebase Authentication（Email/Password）を有効化してください。
-
-2. サービスアカウントキー(JSON)を取得 <br>
-   Firebaseコンソール → プロジェクト設定 → サービスアカウント <br>
-   → 「新しい秘密鍵を生成」からJSONファイルをダウンロード
-
-3. JSONファイルを配置
-
-```bash
-mkdir storage/firebase
-```
-
-    取得したJSONファイルを以下に配置してください。
-
-```
-storage/firebase/firebase.json
-```
-
-4. envに設定
-
-```env
-FIREBASE_CREDENTIALS=storage/firebase/firebase.json
-FIREBASE_PROJECT_ID=your-project-id
-```
-
-※Seederで作成されるユーザーは初期表示用のダミーデータです。
-Firebase Authenticationとは連携していません。
-
-## 7.DB初期化とシーディング
-
-```bash
-php artisan migrate:fresh --seed
-```
-
-(初期表示用のダミーデータを作成)
-
-## 8.サーバー起動
-
-```bash
-php artisan serve
-```
-
-バックエンドURL:
-
-```
-http://127.0.0.1:8000
-```
-
-#### 注意事項(ダミーユーザーについて)
-
-- Seederで作成されるユーザー(Test User1 / Test User2)は初期画面の表示用ダミーデータです。
-- これらのユーザーは Firebase Authentication に存在しないためログインすることはできません。
-- アプリの操作確認（投稿・いいね・コメント等）を行う場合は
-  フロントエンドの「新規登録」から任意のユーザーを作成してください。
-
-## 動作確認手順
-
-1. Backendを起動
-2. Frontendを起動
-3. フロントエンドの「新規登録」からユーザーを作成
-4. ログイン後、以下の操作が可能
-
-- 投稿作成
-- 投稿削除（自分の投稿のみ）
-- いいね
-- コメント作成
-
-## システム構成
-
-Nuxt（Frontend）<br>
-↓ REST API<br>
-Laravel（Backend）<br>
-↓<br>
-MySQL
-
 ## 使用技術
-
-### Backend
 
 - PHP 8.2
 - Laravel 12
 - MySQL
-
-### Authentication
-
-- Firebase Authentication
-
-### Frontend
-
-- Nuxt 4
+- Firebase Authentication(トークン検証)
+- REST API
 
 ## 主な機能
 
-- ユーザー認証(Firebase Authentication)
 - 投稿の一覧表示
 - 投稿作成・削除(認証ユーザーのみ)
 - いいね機能(重複防止)
 - コメント機能
-- 投稿作成・削除・コメント追加・いいね機能は認証ユーザーのみ操作可能
+- 認証ユーザーのみ操作可能なAPI制御
+- Firebase IDトークンの検証(ミドルウェア)
 - 自身の投稿のみ削除可能
-- Seederユーザーは表示用で操作不可
 
-## 使い方（ローカル確認）
+## API設計
 
-1. フロントエンドを起動
-2. Firebaseでユーザー登録
-3. 投稿作成・投稿削除・いいね・コメント作成を操作（
-   ※Seederユーザーは表示用で操作不可
+本アプリではREST APIとしてエンドポイントを設計しています。
+
+### 例
+
+- GET /api/posts → 投稿一覧取得
+- POST /api/posts → 投稿作成
+- DELETE /api/posts/{post} → 投稿削除(投稿者のみ)
+
+フロントエンドからのリクエストには、Firebaseで取得したIDトークンをBearerトークンとして付与します。
+
+## 認証処理
+
+- フロントエンドで取得したFirebase IDトークンを受け取り、Laravel側で検証しています。
+- ミドルウェアでトークンの有効性を確認し、認証済みユーザーのみAPIアクセスを許可しています。
+
+## システム構成
+
+```mermaid
+flowchart LR
+
+    %% ===== Frontend =====
+    A["Nuxt SPA"]
+
+    %% ===== Auth =====
+    B["Firebase Authentication"]
+
+    %% ===== Backend =====
+    C["Laravel API"]
+    D["MySQL"]
+
+    %% ===== Flow =====
+    A -->|ログイン| B
+    B -->|IDトークン| A
+    A -->|APIリクエスト<br/>Bearer Token| C
+    C -->|トークン検証| B
+    C -->|データ操作| D
+
+    %% ===== Style =====
+    style A fill:#d0ebff,color:#000,stroke:#333,stroke-width:2px
+    style B fill:#ffe066,color:#000,stroke:#333,stroke-width:2px
+    style C fill:#d3f9d8,color:#000,stroke:#333,stroke-width:2px
+```
 
 ## テーブル設計
 
@@ -193,14 +90,17 @@ MySQL
 
 ## ER図
 
-![ER図](./index.png)
+![ER図](./docs/index.png)
 
-## 開発環境
+## 設計のポイント
 
-バックエンドURL：
+- Eloquentリレーションを活用し、投稿・コメント・いいねの関係性を管理
+- コントローラーではリレーション経由でデータを操作し、可読性と保守性を向上
+- N+1問題を防ぐため、Eager Loadingを意識した実装
 
-```
-http://127.0.0.1:8000
-```
+## 今後の課題
 
-※ フロントエンドは http://localhost:3000 で起動してください。
+- APIの設計改善（リソース設計・レスポンス統一）
+- 認可（Policy）の導入による権限制御の強化
+- パフォーマンス改善（クエリ最適化）
+- 画像投稿対応（Storage連携）
